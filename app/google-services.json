@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "33813641162",
+    "project_id": "umd-study-spot-finder",
+    "storage_bucket": "umd-study-spot-finder.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33813641162:android:d53cbfc857948fdfc70133",
+        "android_client_info": {
+          "package_name": "com.example.umdstudyspotfinder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBB8WihR7js4fPtdzbTf1AECvnwnIQo39Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

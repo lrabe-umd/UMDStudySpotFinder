@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CMSC436 Group Project"
+rootProject.name = "UMDStudySpotFinder"
 include(":app")
  

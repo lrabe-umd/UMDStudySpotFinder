@@ -1,4 +1,4 @@
-package com.example.cmsc436groupproject
+package com.example.umdstudyspotfinder
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

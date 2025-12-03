@@ -1,4 +1,4 @@
-package com.example.cmsc436groupproject
+package com.example.umdstudyspotfinder
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

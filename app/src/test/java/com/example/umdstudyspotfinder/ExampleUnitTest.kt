@@ -1,4 +1,4 @@
-package com.example.cmsc436groupproject
+package com.example.umdstudyspotfinder
 
 import org.junit.Test
 
