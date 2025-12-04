@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // RUN THIS ONCE to populate database, then comment it out
-        populateStudySpots()
+        // populateStudySpots()
 
         // testDatabase()
     }
