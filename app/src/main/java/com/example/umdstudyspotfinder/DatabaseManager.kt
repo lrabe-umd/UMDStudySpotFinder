@@ -124,7 +124,7 @@ class DatabaseManager {
     fun addRating(spotId: String, rating: Float, callback: ((Boolean) -> Unit)? = null) {
         val spotRef = studySpotsRef.child(spotId)
         // transactions are added in order to control when multiple
-        // users enter data (such as a rating) at the same time
+        // users enter data (such as a rating) at the same time (locks)
         // both are added and no rating is lost
         spotRef.runTransaction(object : Transaction.Handler {
             override fun doTransaction(currentData: MutableData): Transaction.Result {
