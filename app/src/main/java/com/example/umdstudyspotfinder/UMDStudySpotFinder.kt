@@ -12,10 +12,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+    val dbManager : DatabaseManager = DatabaseManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +40,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
         Log.w("MainActivity", "Google map loaded!")
 
-        var update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(UMD_LAT_LNG, 18f)
+        var update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(UMD_LAT_LNG, 15.0f)
         map.moveCamera(update)
+
+        // Create a marker for each study spot
+        dbManager.getAllStudySpots { spots ->
+            for(spot in spots) {
+                val pos = LatLng(spot.latitude, spot.longitude)
+                map.addMarker(
+                    MarkerOptions()
+                        .position(pos)
+                        .title(spot.name)
+                        .snippet(spot.description)
+                )
+            }
+        }
     }
 
     private fun populateStudySpots() {
