@@ -6,8 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.util.Log
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private lateinit var map: GoogleMap
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -16,7 +25,23 @@ class MainActivity : AppCompatActivity() {
         // populateStudySpots()
 
         // testDatabase()
+
+        // Get fragment for google map
+        var mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
+
+        Log.w("MainActivity", "Loading Google map...")
+        mapFragment.getMapAsync(this)
+
     }
+
+    override fun onMapReady(googleMap: GoogleMap): Unit {
+        map = googleMap
+        Log.w("MainActivity", "Google map loaded!")
+
+        var update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(UMD_LAT_LNG, 18f)
+        map.moveCamera(update)
+    }
+
     private fun populateStudySpots() {
         val dbManager = DatabaseManager()
 
@@ -208,5 +233,9 @@ class MainActivity : AppCompatActivity() {
             dbManager.addStudySpot(spot)
         }
         Log.d("MainActivity", "Done populating database!")
+    }
+
+    companion object {
+        val UMD_LAT_LNG: LatLng = LatLng(38.98465556431913, -76.94301522201258)
     }
 }
