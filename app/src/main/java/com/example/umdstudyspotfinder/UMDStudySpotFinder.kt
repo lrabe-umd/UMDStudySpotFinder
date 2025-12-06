@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.util.Log
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,6 +19,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+
+    private lateinit var adView : AdView
     val dbManager : DatabaseManager = DatabaseManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +37,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         Log.w("MainActivity", "Loading Google map...")
         mapFragment.getMapAsync(this)
+
+        Log.w("MainActivity", "Loading Ad from google services...")
+
+        //advertising
+        adView = findViewById(R.id.adView)
+        //adView.adSize = getFullWidthAdSize()
+
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
+        Log.w("MainActivity", "Ad loaded!")
 
     }
 
@@ -248,7 +263,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             dbManager.addStudySpot(spot)
         }
         Log.d("MainActivity", "Done populating database!")
+
+
     }
+
+
+
+
 
     companion object {
         val UMD_LAT_LNG: LatLng = LatLng(38.98465556431913, -76.94301522201258)

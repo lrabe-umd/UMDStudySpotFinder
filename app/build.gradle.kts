@@ -54,4 +54,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //needed for ads
+    implementation("com.google.android.gms:play-services-ads:24.7.0")
 }
