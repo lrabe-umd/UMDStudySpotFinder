@@ -50,7 +50,7 @@
             android:paddingBottom="60dp"
             >
 
-            <!-- Handle bar -->
+            <!-- Handle bar display -->
             <View
                 android:layout_width="40dp"
                 android:layout_height="5dp"
@@ -59,7 +59,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="#CCCCCC" />
 
-            <!-- RecyclerView -->
+            <!-- RecyclerView (holds study spots dynamically) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/studySpotRecycler"
                 android:layout_width="match_parent"
