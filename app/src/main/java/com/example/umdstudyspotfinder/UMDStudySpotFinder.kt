@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.maps.CameraUpdate
@@ -18,10 +19,14 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+
+    // For RecyclerView in collapsible bottom sheet
+    private lateinit var adapter: StudySpotAdapter
 
     private lateinit var adView : AdView
     val dbManager : DatabaseManager = DatabaseManager()
@@ -59,6 +64,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        dbManager.getAllStudySpots { spots ->
+            setupRecycler(spots.toMutableList())
+        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap): Unit {
@@ -80,6 +89,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
         }
+    }
+
+    private fun setupRecycler(spots: MutableList<StudySpot>) {
+        // Get recycler
+        val recycler = findViewById<RecyclerView>(R.id.studySpotRecycler)
+
+        // Create adapter
+        adapter = StudySpotAdapter(spots)
+
+        // Set up recycler stuff
+        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.adapter = adapter
     }
 
     private fun populateStudySpots() {
