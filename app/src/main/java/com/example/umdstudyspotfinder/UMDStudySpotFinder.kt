@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         map.moveCamera(update)
 
         // Add markers
-        dbManager.getFilteredStudySpots(10f, selectedTagList,{ spots ->
+        dbManager.getFilteredStudySpots(10f, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
                 var marker = map.addMarker(

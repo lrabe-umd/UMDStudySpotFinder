@@ -1,5 +1,6 @@
 package com.example.umdstudyspotfinder
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
@@ -49,10 +50,14 @@ class DatabaseManager {
 
                         //Step 2: Filter by tag
                         // TODO: Actually do tag filtering through settings and mainActivity
-                        for(tag in tagList) {
-                            if(spot.tags.contains(tag) ) {
-                                spots.add(spot)
+                        if(!tagList.isEmpty()) {
+                            for (tag in tagList) {
+                                if (spot.tags.contains(tag)) {
+                                    spots.add(spot)
+                                }
                             }
+                        }else{
+                            spots.add(spot)
                         }
                     }
                 }
@@ -202,5 +207,40 @@ class DatabaseManager {
                 callback(0.0)
             }
         })
+    }
+
+    //used to handle persistent data for preferences
+    companion object SavedPrefs {
+        private const val PREF_NAME = "prefData"
+        private const val KEY_LIST = "keyList"
+
+        private fun prefs(context: Context) =
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
+        fun getAll(context: Context): MutableSet<String> {
+            return prefs(context)
+                .getStringSet(KEY_LIST, emptySet())
+                ?.toMutableSet() ?: mutableSetOf()
+        }
+
+        fun add(context: Context, value: String) {
+            val set = getAll(context)
+            set.add(value)
+            prefs(context).edit().putStringSet(KEY_LIST, set).apply()
+
+            Log.d("DatabaseManager", "added "+value+" to prefs")
+        }
+
+        fun remove(context: Context, value: String) {
+            val set = getAll(context)
+            set.remove(value)
+            prefs(context).edit().putStringSet(KEY_LIST, set).apply()
+
+            Log.d("DatabaseManager", "removed "+value+" from prefs")
+        }
+
+        fun clear(context: Context) {
+            prefs(context).edit().remove(KEY_LIST).apply()
+        }
     }
 }
