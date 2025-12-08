@@ -45,7 +45,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
     implementation("com.google.firebase:firebase-database")
 
-    // Google Play Services (Maps)
+    // Google Play Services (Maps, GPS)
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Android

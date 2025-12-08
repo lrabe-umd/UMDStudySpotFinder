@@ -2,6 +2,9 @@ package com.example.umdstudyspotfinder
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Looper
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -9,6 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
@@ -20,6 +25,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -34,6 +45,39 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     // TODO: Update based on SeekBar
     private var seekBarMaxDist: Float = 10f
     private lateinit var selectedTagList: MutableList<String>
+
+    private lateinit var locationClient: FusedLocationProviderClient
+
+    // ONLY USE GPS FOR BUILDS TO ACTUAL DEVICE!
+    private var useGPS: Boolean = false
+
+    private val gpsPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            permissions ->
+
+            if(permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                // User granted fine location access
+                startGPSRequests()
+            } else if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+                // User granted only coarse location access
+            } else {
+                // User did not grant any location access
+            }
+        }
+
+    private val locationCallback = object: LocationCallback() {
+        override fun onLocationResult(p0: LocationResult) {
+            super.onLocationResult(p0)
+
+            val location = p0.lastLocation
+            if(location != null) {
+                if(map != null) {
+                    val cameraUpdate = CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude))
+                    map.moveCamera(cameraUpdate)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +121,40 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        if(useGPS) {
+            requestGPSPermissions()
+        }
+
+    }
+
+    private fun startGPSRequests() {
+        locationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // GPS request every 10 seconds
+        val locationRequest =
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000L).build()
+
+        // Make sure we actually have the perms
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+
+        locationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun requestGPSPermissions() {
+        gpsPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     override fun onMapReady(googleMap: GoogleMap): Unit {
@@ -90,7 +168,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         dbManager.getFilteredStudySpots(10f, selectedTagList,{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
-                map.addMarker(
+                var marker = map.addMarker(
                     MarkerOptions()
                         .position(pos)
                         .title(spot.name)
