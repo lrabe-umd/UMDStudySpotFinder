@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // GPS request every 10 seconds
         val locationRequest =
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000L).build()
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
 
         // Make sure we actually have the perms
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
