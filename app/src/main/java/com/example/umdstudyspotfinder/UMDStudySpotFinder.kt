@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var adView : AdView
     val dbManager : DatabaseManager = DatabaseManager()
 
+    // TODO: Update based on SeekBar
+    private var seekBarMaxDist: Float = 10f
+    private lateinit var selectedTagList: MutableList<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +43,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // populateStudySpots()
 
         // testDatabase()
+
+        // Test filter values
+        seekBarMaxDist = 10f
+        selectedTagList = mutableListOf("outside")
+
+        // Get study spots
+        dbManager.getFilteredStudySpots(seekBarMaxDist, selectedTagList, { spots ->
+            setupRecycler(spots.toMutableList())
+        })
 
         // Get fragment for google map
         var mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
@@ -64,10 +77,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
-        dbManager.getAllStudySpots { spots ->
-            setupRecycler(spots.toMutableList())
-        }
-
     }
 
     override fun onMapReady(googleMap: GoogleMap): Unit {
@@ -77,8 +86,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         var update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(UMD_LAT_LNG, 15.0f)
         map.moveCamera(update)
 
-        // Create a marker for each study spot
-        dbManager.getAllStudySpots { spots ->
+        // Add markers
+        dbManager.getFilteredStudySpots(10f, selectedTagList,{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
                 map.addMarker(
@@ -88,7 +97,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .snippet(spot.description)
                 )
             }
-        }
+        })
     }
 
     private fun setupRecycler(spots: MutableList<StudySpot>) {

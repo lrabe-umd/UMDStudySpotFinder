@@ -34,6 +34,37 @@ class DatabaseManager {
         })
     }
 
+    fun getFilteredStudySpots(maxDist: Float, tagList: List<String>, callback: (List<StudySpot>) -> Unit) {
+        studySpotsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val spots = mutableListOf<StudySpot>()
+                for (childSnapshot in snapshot.children) {
+                    val spot = childSnapshot.getValue(StudySpot::class.java)
+                    if (spot != null) {
+
+                        // Step 1: Filter by distance
+                        // TODO: Actually calculate and filter by distance
+                        var spotIsCloseEnough = true
+                        if(!spotIsCloseEnough) continue // skip and don't add spot
+
+                        //Step 2: Filter by tag
+                        // TODO: Actually do tag filtering through settings and mainActivity
+                        for(tag in tagList) {
+                            if(spot.tags.contains(tag) ) {
+                                spots.add(spot)
+                            }
+                        }
+                    }
+                }
+                callback(spots)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("DatabaseManager", "Error: ${error.message}")
+            }
+        })
+    }
+
     // listen to real-time changes in spots (very similar to above)
     fun listenToStudySpots(callback: (List<StudySpot>) -> Unit) {
         studySpotsRef.addValueEventListener(object : ValueEventListener {
