@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="76dp"
+            android:layout_height="80dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="16dp"
+            android:background="@android:color/transparent"
+            android:padding="0dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/back_button" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:text="Preferences"
+            android:textSize="30dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <Button
+                android:id="@+id/groupStudyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Group Study"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:gravity="center" />
+            <Button
+                android:id="@+id/reservableButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Reservable"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/groupStudyButton"
+                app:layout_constraintVertical_bias="0.8" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <Button
+                android:id="@+id/OutletsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Outlets"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:gravity="center" />
+            <Button
+                android:id="@+id/foodButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Food Nearby"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/groupStudyButton"
+                app:layout_constraintVertical_bias="0.8" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <Button
+                android:id="@+id/whiteboardsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Whiteboards"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:gravity="center" />
+            <Button
+                android:id="@+id/windowsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Windows"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/groupStudyButton"
+                app:layout_constraintVertical_bias="0.8" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <Button
+                android:id="@+id/quietStudyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Quiet Study"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:gravity="center" />
+            <Button
+                android:id="@+id/outsideButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="Outside"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/groupStudyButton"
+                app:layout_constraintVertical_bias="0.8" />
+        </LinearLayout>
+
+
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:text="Display Settings"
+            android:textSize="30dp"/>
+
+        <Switch
+            android:layout_gravity="center"
+            android:id="@+id/switchTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dark Mode"
+            android:scaleX="2"
+            android:scaleY="2"
+            />
+
+
+
+    </LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+</FrameLayout>

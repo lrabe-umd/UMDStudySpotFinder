@@ -1,11 +1,14 @@
 package com.example.umdstudyspotfinder
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.util.Log
+import android.widget.Button
+import android.widget.ImageButton
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.maps.CameraUpdate
@@ -48,6 +51,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         adView.loadAd(adRequest)
 
         Log.w("MainActivity", "Ad loaded!")
+
+        //Setup settings button
+        val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
+        settingsButton.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
     }
 

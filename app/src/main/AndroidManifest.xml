@@ -11,6 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CMSC436GroupProject">
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.CMSC436GroupProject" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -25,13 +30,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.google.android.gms.ads.AdActivity"/>
+        <activity android:name="com.google.android.gms.ads.AdActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDmidMSNhjI6m49Z7X8YRFSY0CWhTav2Ds"
-            />
+            android:value="AIzaSyDmidMSNhjI6m49Z7X8YRFSY0CWhTav2Ds" />
     </application>
 
 </manifest>

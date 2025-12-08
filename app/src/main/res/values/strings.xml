@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">UMD Study Spot Finder</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>
