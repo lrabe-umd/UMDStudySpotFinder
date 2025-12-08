@@ -43,7 +43,7 @@ class StudySpotAdapter(
             tagList = tagList.dropLast(2) // remove last 2 chars (, )
             tagText.text = tagList
 
-            // TODO: Make heart button
+            // TODO: Dynamic heart button
             /*
             if(spotFavorited) {
                 show filled heart

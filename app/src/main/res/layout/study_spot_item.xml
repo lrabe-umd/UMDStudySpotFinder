@@ -12,7 +12,7 @@
 
         <TextView
             android:id="@+id/spot_name"
-            android:layout_width="285dp"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
             android:text="Spot Name"
@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/spot_tags"
-            android:layout_width="285dp"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/spot_name"
             android:paddingLeft="8dp"
@@ -50,10 +50,9 @@
             android:layout_toStartOf="@id/infoButton"
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             android:background="@android:color/transparent"
-            android:rotation="180"
-            android:src="@drawable/settings_button"
-            /> <!-- Make it a heart later! -->
+            android:src="@drawable/heart_empty"
+            />
     </RelativeLayout>
 </RelativeLayout>
