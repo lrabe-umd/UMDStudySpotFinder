@@ -1,7 +1,9 @@
 package com.example.umdstudyspotfinder
 
 import android.content.Context
+import android.location.Location
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
 
@@ -35,7 +37,7 @@ class DatabaseManager {
         })
     }
 
-    fun getFilteredStudySpots(maxDist: Float, tagList: List<String>, callback: (List<StudySpot>) -> Unit) {
+    fun getFilteredStudySpots(curLoc: LatLng?, maxDist: Float, tagList: List<String>, callback: (List<StudySpot>) -> Unit) {
         studySpotsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val spots = mutableListOf<StudySpot>()
@@ -44,9 +46,21 @@ class DatabaseManager {
                     if (spot != null) {
 
                         // Step 1: Filter by distance
-                        // TODO: Actually calculate and filter by distance
-                        var spotIsCloseEnough = true
-                        if(!spotIsCloseEnough) continue // skip and don't add spot
+                        if(curLoc != null) {
+                            var userLoc = Location("userLoc")
+                            userLoc.latitude = curLoc.latitude
+                            userLoc.longitude = curLoc.longitude
+
+                            var spotLoc = Location("spotLoc")
+                            spotLoc.latitude = spot.latitude
+                            spotLoc.longitude = spot.longitude
+
+                            var distance: Float = userLoc.distanceTo(spotLoc)
+
+                            var spotIsCloseEnough = distance <= maxDist
+
+                            if(!spotIsCloseEnough) continue // skip and don't add spot
+                        }
 
                         //Step 2: Filter by tag
                         // TODO: Actually do tag filtering through settings and mainActivity

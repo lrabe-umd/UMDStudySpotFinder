@@ -30,6 +30,34 @@
         android:scaleType="centerInside"
         android:src="@drawable/settings_button" />
 
+    <!-- about 1km to about 100km, squared in code -->
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_height="10dp"
+        android:layout_width="300dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="225dp"
+        android:scrollbarSize="100dp"
+        android:progress="100"
+        android:max="223"
+        android:min="16"
+        >
+
+    </SeekBar>
+
+    <TextView
+        android:id="@+id/seekbarDistDisplay"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="250dp"
+        android:textSize="24sp"
+        android:text="10km"
+        >
+
+    </TextView>
+
     <!-- Settings Button -->
     <ImageButton
         android:id="@+id/recenterButton"
@@ -46,7 +74,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="550dp"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        >
 
         <LinearLayout
             android:id="@+id/collapsible_menu"
