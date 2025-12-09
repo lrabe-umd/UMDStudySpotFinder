@@ -7,8 +7,12 @@
 
     <!-- Extra layout lets us center buttons relative to text despite paddingBottom  -->
     <RelativeLayout
+        android:id="@+id/spot_details"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp"
+        >
 
         <TextView
             android:id="@+id/spot_name"

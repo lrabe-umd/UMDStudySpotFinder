@@ -5,13 +5,10 @@ import android.os.Bundle
 import android.os.Looper
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import android.util.Log
-import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,8 +28,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.Marker
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
 
@@ -40,6 +39,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var adapter: StudySpotAdapter
 
     private lateinit var adView : AdView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var bottomSheet : LinearLayout
+
     val dbManager : DatabaseManager = DatabaseManager()
 
     // TODO: Update based on SeekBar
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var selectedTagList: MutableList<String>
 
     private lateinit var locationClient: FusedLocationProviderClient
+
 
     // ONLY USE GPS FOR BUILDS TO ACTUAL DEVICE!
     private var useGPS: Boolean = false
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             if(location != null) {
                 if(map != null) {
                     val cameraUpdate = CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude))
-                    map.moveCamera(cameraUpdate)
+                    map.animateCamera(cameraUpdate)
                 }
             }
         }
@@ -93,7 +96,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         selectedTagList = mutableListOf("outside")
 
         // Get study spots
-        dbManager.getFilteredStudySpots(seekBarMaxDist, selectedTagList, { spots ->
+        dbManager.getFilteredStudySpots(seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
             setupRecycler(spots.toMutableList())
         })
 
@@ -113,6 +116,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         adView.loadAd(adRequest)
 
         Log.w("MainActivity", "Ad loaded!")
+
+        // Get bottom sheet
+        bottomSheet = findViewById<LinearLayout>(R.id.collapsible_menu)
 
         //Setup settings button
         val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
@@ -176,18 +182,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
         })
+
+        // Subscribe to marker clicks
+        map.setOnMarkerClickListener(this)
     }
 
     private fun setupRecycler(spots: MutableList<StudySpot>) {
         // Get recycler
-        val recycler = findViewById<RecyclerView>(R.id.studySpotRecycler)
+        recyclerView = findViewById(R.id.studySpotRecycler)
 
         // Create adapter
         adapter = StudySpotAdapter(spots)
 
         // Set up recycler stuff
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        Log.w("MainActivity", "Marker clicked: " + marker.title)
+
+        for(spot in adapter.spots) {
+            val index = adapter.spots.indexOf(spot)
+
+            if(spot.name == marker.title) {
+                // Expand BottomSheet
+                val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                // Update Highlight
+                adapter.highlightedIndex = index
+                adapter.notifyDataSetChanged()
+
+                // Scroll to selected spot
+                recyclerView.smoothScrollToPosition(index)
+            }
+        }
+
+        return true
     }
 
     private fun populateStudySpots() {
@@ -384,9 +416,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     }
-
-
-
 
 
     companion object {

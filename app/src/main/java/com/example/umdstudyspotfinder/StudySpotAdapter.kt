@@ -1,17 +1,22 @@
 package com.example.umdstudyspotfinder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 // This class essentially tells the RecyclerView how to update
 // the study_spot_item.xml based on each StudySpot
 class StudySpotAdapter(
-    private val spots: MutableList<StudySpot>,
+    val spots: MutableList<StudySpot>,
 ): RecyclerView.Adapter<StudySpotAdapter.SpotViewHolder>() {
+
+    var highlightedIndex: Int? = null
 
     inner class SpotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameText: TextView = itemView.findViewById(R.id.spot_name)
@@ -69,6 +74,12 @@ class StudySpotAdapter(
     }
 
     override fun onBindViewHolder(holder: SpotViewHolder, position: Int) {
+        if(highlightedIndex == position) {
+            holder.itemView.findViewById<RelativeLayout>(R.id.spot_details).setBackgroundColor(Color.LTGRAY)
+        } else {
+            holder.itemView.findViewById<RelativeLayout>(R.id.spot_details).setBackgroundColor(Color.WHITE)
+        }
+
         holder.bind(spots[position])
     }
 
