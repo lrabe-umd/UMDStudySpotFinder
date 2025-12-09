@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.ImageButton
@@ -28,31 +29,32 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    private lateinit var map: GoogleMap
-
-    // For RecyclerView in collapsible bottom sheet
-    private lateinit var adapter: StudySpotAdapter
-
-    private lateinit var adView : AdView
+    // Collapsible BottomSheet
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: StudySpotAdapter
     private lateinit var bottomSheet : LinearLayout
 
+    // Ads, Database, Google Maps
+    private lateinit var adView : AdView
     val dbManager : DatabaseManager = DatabaseManager()
+    private lateinit var map: GoogleMap
 
+    // Filters
     // TODO: Update based on SeekBar
     private var seekBarMaxDist: Float = 10f
     private lateinit var selectedTagList: MutableList<String>
 
+    // GPS
     private lateinit var locationClient: FusedLocationProviderClient
-
-
-    // ONLY USE GPS FOR BUILDS TO ACTUAL DEVICE!
-    private var useGPS: Boolean = false
+    private var curLatLng: LatLng? = null
+    private var locationIndicator: Circle? = null
 
     private val gpsPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -75,8 +77,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             val location = p0.lastLocation
             if(location != null) {
                 if(map != null) {
-                    val cameraUpdate = CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude))
-                    map.animateCamera(cameraUpdate)
+                    curLatLng = LatLng(location.latitude, location.longitude)
+                    drawGPSLocationOnMap()
                 }
             }
         }
@@ -120,47 +122,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Get bottom sheet
         bottomSheet = findViewById<LinearLayout>(R.id.collapsible_menu)
 
-        //Setup settings button
+        // Setup settings button
         val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
         settingsButton.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        if(useGPS) {
-            requestGPSPermissions()
+        // Setup recenter button
+        val recenterButton = findViewById<ImageButton>(R.id.recenterButton)
+        recenterButton.setOnClickListener {
+            moveMapToGPSLocation()
         }
 
-    }
+        // Initialize GPS
+        requestGPSPermissions()
 
-    private fun startGPSRequests() {
-        locationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        // GPS request every 10 seconds
-        val locationRequest =
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
-
-        // Make sure we actually have the perms
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
-
-        locationClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
-    }
-
-    private fun requestGPSPermissions() {
-        gpsPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
     }
 
     override fun onMapReady(googleMap: GoogleMap): Unit {
@@ -185,6 +162,59 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         // Subscribe to marker clicks
         map.setOnMarkerClickListener(this)
+    }
+
+    private fun startGPSRequests() {
+        locationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // GPS request every 10 seconds
+        val locationRequest =
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
+
+        // Make sure we actually have the perms
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+
+        locationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+
+        Log.w("MainActivity", "GPS requests started!")
+    }
+
+    private fun requestGPSPermissions() {
+        gpsPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    private fun moveMapToGPSLocation() {
+        if(curLatLng == null) return
+        val cameraUpdate = CameraUpdateFactory.newLatLng(curLatLng!!)
+        map.animateCamera(cameraUpdate)
+    }
+
+    private fun drawGPSLocationOnMap() {
+        if(curLatLng == null) return
+
+        if(locationIndicator != null) {
+            locationIndicator!!.remove()
+        }
+
+        locationIndicator = map.addCircle(
+            CircleOptions()
+                .center(curLatLng!!)
+                .radius(50.0)
+                .fillColor(Color.CYAN)
+        )
     }
 
     private fun setupRecycler(spots: MutableList<StudySpot>) {
@@ -416,7 +446,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
     }
-
 
     companion object {
         val UMD_LAT_LNG: LatLng = LatLng(38.98465556431913, -76.94301522201258)
