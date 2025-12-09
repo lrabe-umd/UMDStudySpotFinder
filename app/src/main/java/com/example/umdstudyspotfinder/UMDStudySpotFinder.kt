@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var selectedTagList: MutableList<String>
 
     // GPS
-    private var useGPS : Boolean = false
+    private var useGPS : Boolean = true
     private lateinit var locationClient: FusedLocationProviderClient
     private var curLatLng: LatLng? = null
     private var locationIndicator: Circle? = null
