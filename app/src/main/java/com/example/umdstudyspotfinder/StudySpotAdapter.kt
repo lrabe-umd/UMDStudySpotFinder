@@ -1,5 +1,6 @@
 package com.example.umdstudyspotfinder
 
+import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.FirebaseDatabase
 
 // This class essentially tells the RecyclerView how to update
 // the study_spot_item.xml based on each StudySpot
@@ -59,11 +61,13 @@ class StudySpotAdapter(
 
             // TODO: Listeners
             favButton.setOnClickListener {
-                // Favorite the spot and update image
+
             }
 
             infoButton.setOnClickListener {
-                // Start the spot info activity
+                val intent = Intent(itemView.context, MoreInfoActivity::class.java)
+                intent.putExtra("spot_id", spot.id)
+                itemView.context.startActivity(intent)
             }
         }
     }

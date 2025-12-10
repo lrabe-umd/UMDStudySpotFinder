@@ -40,7 +40,7 @@ class DatabaseManager {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val spots = mutableListOf<StudySpot>()
                 for (childSnapshot in snapshot.children) {
-                    val spot = childSnapshot.getValue(StudySpot::class.java)
+                    val spot:StudySpot? = childSnapshot.getValue(StudySpot::class.java)
                     if (spot != null) {
 
                         // Step 1: Filter by distance
@@ -59,6 +59,8 @@ class DatabaseManager {
                         }else{
                             spots.add(spot)
                         }
+                    } else {
+                        Log.w("DatabaseManager", "Skipping invalid study spot: ${childSnapshot.value}")
                     }
                 }
                 callback(spots)
