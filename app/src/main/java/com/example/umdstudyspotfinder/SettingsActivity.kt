@@ -124,12 +124,12 @@ class SettingsActivity : ComponentActivity() {
     fun updateButtonVisuals(context: Context){
         if(DatabaseManager.SavedPrefs.getAll(context).isEmpty()){
             buttons.forEach { btn ->
-                val color = Color.BLUE
+                val color = Color.GRAY
                 btn.backgroundTintList = ColorStateList.valueOf(color)
             }
         }else{
             buttons.forEach { btn ->
-                val color = if (btn.isSelected) Color.RED else Color.GRAY
+                val color = if (btn.isSelected) Color.RED else Color.DKGRAY
                 btn.backgroundTintList = ColorStateList.valueOf(color)
             }
         }

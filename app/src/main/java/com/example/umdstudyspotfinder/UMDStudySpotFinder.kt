@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,13 +47,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var adView : AdView
     val dbManager : DatabaseManager = DatabaseManager()
     private lateinit var map: GoogleMap
+    private var mapMarkers: ArrayList<Marker> = ArrayList()
 
     // Filters
     // TODO: Update based on SeekBar
-    private var seekBarMaxDist: Float = 10f
+    private var seekBarMaxDist: Float = 10000f
     private lateinit var selectedTagList: MutableList<String>
 
     // GPS
+    private var useGPS : Boolean = true
     private lateinit var locationClient: FusedLocationProviderClient
     private var curLatLng: LatLng? = null
     private var locationIndicator: Circle? = null
@@ -79,6 +83,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 if(map != null) {
                     curLatLng = LatLng(location.latitude, location.longitude)
                     drawGPSLocationOnMap()
+                    updateMapMarkers()
+                    updateRecycler()
                 }
             }
         }
@@ -94,11 +100,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // testDatabase()
 
         // Test filter values
-        seekBarMaxDist = 10f
         selectedTagList = mutableListOf("outside")
 
         // Get study spots
-        dbManager.getFilteredStudySpots(seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
+        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
             setupRecycler(spots.toMutableList())
         })
 
@@ -135,9 +140,37 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             moveMapToGPSLocation()
         }
 
-        // Initialize GPS
-        requestGPSPermissions()
+        // Setup seekbar
+        var seekbar = findViewById<SeekBar>(R.id.seekbar)
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                Log.w("MainActivity", progress.toString())
 
+                // Square progress to get real value
+                seekBarMaxDist = progress.toFloat() * progress.toFloat()
+                val distInKm : Float = seekBarMaxDist / 1000.0f
+                val kmString = String.format("%.1f", distInKm)
+                findViewById<TextView>(R.id.seekbarDistDisplay).text = "${kmString}km"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                updateMapMarkers()
+            }
+
+        })
+
+        // Initialize GPS
+        if(useGPS) {
+            requestGPSPermissions()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap): Unit {
@@ -148,7 +181,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         map.moveCamera(update)
 
         // Add markers
-        dbManager.getFilteredStudySpots(10f, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
                 var marker = map.addMarker(
@@ -157,11 +190,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         .title(spot.name)
                         .snippet(spot.description)
                 )
+                mapMarkers.add(marker!!)
             }
         })
 
         // Subscribe to marker clicks
         map.setOnMarkerClickListener(this)
+    }
+
+    fun updateMapMarkers() {
+        for(marker in mapMarkers) {
+            marker.remove()
+        }
+
+        // Add markers
+        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+            for(spot in spots) {
+                val pos = LatLng(spot.latitude, spot.longitude)
+                var marker = map.addMarker(
+                    MarkerOptions()
+                        .position(pos)
+                        .title(spot.name)
+                        .snippet(spot.description)
+                )
+                mapMarkers.add(marker!!)
+            }
+        })
     }
 
     private fun startGPSRequests() {
@@ -227,6 +281,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Set up recycler stuff
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
+
+    private fun updateRecycler() {
+        // Add markers
+        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+            setupRecycler(spots.toMutableList())
+        })
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
