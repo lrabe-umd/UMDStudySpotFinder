@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var seekBarMaxDist: Float = 10000f
 
     // GPS
-    private var useGPS : Boolean = true
+    private var useGPS : Boolean = false
     private var gpsManager : GPSManager? = null
     private var locationIndicator: Circle? = null
     private val gpsPermissionLauncher =
