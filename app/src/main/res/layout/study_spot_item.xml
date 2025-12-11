@@ -47,16 +47,6 @@
             android:src="@drawable/back_button"
             />
 
-        <ImageButton
-            android:id="@+id/favButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_toStartOf="@id/infoButton"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:scaleType="centerCrop"
-            android:background="@android:color/transparent"
-            android:src="@drawable/heart_empty"
-            />
+
     </RelativeLayout>
 </RelativeLayout>

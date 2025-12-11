@@ -23,7 +23,6 @@ class StudySpotAdapter(
     inner class SpotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameText: TextView = itemView.findViewById(R.id.spot_name)
         val tagText: TextView = itemView.findViewById(R.id.spot_tags)
-        val favButton: ImageButton = itemView.findViewById(R.id.favButton)
         val infoButton: ImageButton = itemView.findViewById(R.id.infoButton)
 
         fun bind(spot: StudySpot) {
@@ -50,19 +49,6 @@ class StudySpotAdapter(
             tagList = tagList.dropLast(2) // remove last 2 chars (, )
             tagText.text = tagList
 
-            // TODO: Dynamic heart button
-            /*
-            if(spotFavorited) {
-                show filled heart
-            } else {
-                show empty heart
-            }
-             */
-
-            // TODO: Listeners
-            favButton.setOnClickListener {
-
-            }
 
             infoButton.setOnClickListener {
                 val intent = Intent(itemView.context, MoreInfoActivity::class.java)
