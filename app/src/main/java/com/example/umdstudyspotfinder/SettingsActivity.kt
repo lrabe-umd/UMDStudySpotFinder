@@ -39,36 +39,18 @@ class SettingsActivity : ComponentActivity() {
     private lateinit var outsideButton : Button
     private lateinit var reservableButton : Button
 
-    private lateinit var nightToggle : Switch
+    private lateinit var favoritesButton : Button
 
     private lateinit var buttons : List<Button>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        //apply day or night mode
-        loadNightMode()
-
         setContentView(R.layout.activity_settings)
 
-        nightToggle = findViewById<Switch>(R.id.switchTheme)
-
-        nightToggle.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
-
-        nightToggle.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                saveNightMode(true)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                saveNightMode(false)
-            }
-        }
 
         //setup ad
         adView = findViewById(R.id.adView)
-        //adView.adSize = getFullWidthAdSize()
 
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
@@ -76,8 +58,9 @@ class SettingsActivity : ComponentActivity() {
         //setup back button
         val backButton = findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            //val intent = Intent(this, MainActivity::class.java)
+            //startActivity(intent)
+            finish()
         }
 
         //setup pref buttons
@@ -89,8 +72,9 @@ class SettingsActivity : ComponentActivity() {
         quietStudyButton = findViewById<Button>(R.id.quietStudyButton)
         outsideButton = findViewById<Button>(R.id.outsideButton)
         reservableButton = findViewById<Button>(R.id.reservableButton)
+        favoritesButton = findViewById<Button>(R.id.favoritesButton)
 
-        buttons = listOf(groupStudyButton, outletsButton, foodButton, whiteboardsButton, windowsButton, quietStudyButton, outsideButton, reservableButton)
+        buttons = listOf(groupStudyButton, outletsButton, foodButton, whiteboardsButton, windowsButton, quietStudyButton, outsideButton, reservableButton, favoritesButton)
 
         val currPrefs = DatabaseManager.SavedPrefs.getAll(this)
         buttons.forEach { btn ->
@@ -136,35 +120,8 @@ class SettingsActivity : ComponentActivity() {
 
 
     }
-/*
-    private fun toggleNightMode() {
-        val currentMode = AppCompatDelegate.getDefaultNightMode()
-        if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            // Switch to light
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            saveNightMode(false)
-        } else {
-            // Switch to dark
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            saveNightMode(true)
-        }
-    }
-*/
-    private fun saveNightMode(isDarkMode: Boolean) {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(DARK_MODE_KEY, isDarkMode).apply()
-    }
 
-    private fun loadNightMode() {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val isDarkMode = prefs.getBoolean(DARK_MODE_KEY, false)
-        if (isDarkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            Log.d("Settings Activity","Loading in nightmode")
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            Log.d("Settings Activity","Loading in daymode")
-        }
-    }
+
+
 }
 

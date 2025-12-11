@@ -181,28 +181,25 @@
                 app:layout_constraintVertical_bias="0.8" />
         </LinearLayout>
 
-
-
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_gravity="top"
-            android:layout_marginTop="0dp"
-            android:gravity="center"
-            android:text="Display Settings"
-            android:textSize="30dp"/>
-
-        <Switch
-            android:layout_gravity="center"
-            android:id="@+id/switchTheme"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dark Mode"
-            android:scaleX="2"
-            android:scaleY="2"
-            />
+            android:orientation="horizontal"
+            android:layout_gravity="top">
+
+            <Button
+                android:id="@+id/favoritesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#22222222"
+                android:text="My Favorites"
+                android:tag = "favorites"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:gravity="center" />
+        </LinearLayout>
 
 
 

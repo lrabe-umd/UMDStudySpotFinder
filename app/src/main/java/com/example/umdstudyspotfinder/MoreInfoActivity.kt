@@ -6,6 +6,8 @@ import android.widget.ImageButton
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.firebase.database.*
 
 class MoreInfoActivity : AppCompatActivity() {
@@ -17,7 +19,12 @@ class MoreInfoActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
 
     private lateinit var dbRef: DatabaseReference
+
+    private lateinit var favButton : ImageButton
+
     private lateinit var spotId: String
+
+    private lateinit var adView : AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +35,7 @@ class MoreInfoActivity : AppCompatActivity() {
         tvSpotRating = findViewById(R.id.info_rating_value)
         ratingBar = findViewById(R.id.info_rating_bar)
         backButton = findViewById(R.id.info_back_button)
+        favButton = findViewById(R.id.info_fav_button)
 
         // Get the study spot ID passed from previous activity
         spotId = intent.getStringExtra("spot_id") ?: ""
@@ -42,10 +50,32 @@ class MoreInfoActivity : AppCompatActivity() {
             .getReference("study_spots")
             .child(spotId)
 
+        //setup ad
+        adView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
         // Back button
         backButton.setOnClickListener {
             finish()
         }
+
+        //favorite button
+        favButton.setOnClickListener {
+            Log.d("MoreInfoActivity", "before Faves are "+ FavoriteUtils.getFavoritesList(this));
+            if(FavoriteUtils.isFavorited(spotId, this)){
+                Log.d("MoreInfoActivity", "already in favorites, removing");
+                FavoriteUtils.removeFavorite(spotId, this)
+            }else{
+                Log.d("MoreInfoActivity", "not in favorites, adding");
+                FavoriteUtils.addFavorite(spotId, this)
+            }
+            updateFavoriteButton()
+            Log.d("MoreInfoActivity", "Faves are "+ FavoriteUtils.getFavoritesList(this));
+        }
+
+        //update fav button
+        updateFavoriteButton()
 
         // Load study spot details and rating in real time
         loadSpotDetailsRealtime()
@@ -110,5 +140,13 @@ class MoreInfoActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun updateFavoriteButton(){
+        if(!FavoriteUtils.isFavorited(spotId, this)){
+            favButton.setImageResource((R.drawable.heart_empty))
+        }else{
+            favButton.setImageResource((R.drawable.heart_filled))
+        }
     }
 }

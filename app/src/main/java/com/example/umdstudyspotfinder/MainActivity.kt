@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Get filtered study spots
         dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
             setupRecycler(spots.toMutableList())
-        })
+        }, this)
 
         // Get fragment for google map
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
@@ -107,6 +107,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
+    override fun onResume(){
+        super.onResume()
+        updateMapMarkers()
+        updateRecycler()
+    }
+
     override fun onMapReady(googleMap: GoogleMap): Unit {
         map = googleMap
         Log.w("MainActivity", "Google map loaded!")
@@ -127,7 +133,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 )
                 mapMarkers.add(marker!!)
             }
-        })
+        }, this)
 
         // Subscribe to marker clicks
         map.setOnMarkerClickListener(this)
@@ -208,7 +214,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 )
                 mapMarkers.add(marker!!)
             }
-        })
+        }, this)
     }
 
     private fun onGPSUpdate() {
@@ -263,7 +269,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Add markers
         dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             setupRecycler(spots.toMutableList())
-        })
+        }, this)
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {

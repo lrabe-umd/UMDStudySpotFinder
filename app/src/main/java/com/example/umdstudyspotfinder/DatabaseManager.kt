@@ -37,7 +37,7 @@ class DatabaseManager {
         })
     }
 
-    fun getFilteredStudySpots(curLoc: LatLng?, maxDist: Float, tagList: List<String>, callback: (List<StudySpot>) -> Unit) {
+    fun getFilteredStudySpots(curLoc: LatLng?, maxDist: Float, tagList: List<String>, callback: (List<StudySpot>) -> Unit, context : Context) {
         studySpotsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val spots = mutableListOf<StudySpot>()
@@ -66,9 +66,16 @@ class DatabaseManager {
                         // TODO: Actually do tag filtering through settings and mainActivity
                         if(!tagList.isEmpty()) {
                             for (tag in tagList) {
-                                if (spot.tags.contains(tag)) {
-                                    spots.add(spot)
+                                if(tag == "favorites"){
+                                    if(FavoriteUtils.isFavorited(spot.id,context)){
+                                        spots.add(spot)
+                                    }
+                                }else{
+                                    if (spot.tags.contains(tag)) {
+                                        spots.add(spot)
+                                    }
                                 }
+
                             }
                         }else{
                             spots.add(spot)
