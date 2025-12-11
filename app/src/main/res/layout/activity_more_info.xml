@@ -35,6 +35,24 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/info_average_rating_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Average Rating"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <RatingBar
+            android:id="@+id/info_average_rating_bar"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:stepSize=".5"
+            android:rating="0" />
+
         <ImageButton
             android:id="@+id/info_fav_button"
             android:layout_width="40dp"
@@ -66,21 +84,22 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/info_rating_value"
+            android:id="@+id/info_user_rating_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Rating"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_marginTop="20dp"/>
 
         <RatingBar
-            android:id="@+id/info_rating_bar"
-            android:layout_marginTop="5dp"
-            android:numStars="5"
-            android:stepSize="1.0"
+            android:id="@+id/info_user_rating_bar"
+            android:isIndicator="false"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            android:rating="0" />
 
     </LinearLayout>
 
