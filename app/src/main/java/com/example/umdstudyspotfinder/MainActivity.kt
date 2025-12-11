@@ -51,9 +51,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var mapMarkers: ArrayList<Marker> = ArrayList()
 
     // Filters
-    // TODO: Update based on SeekBar
     private var seekBarMaxDist: Float = 10000f
-    private lateinit var selectedTagList: MutableList<String>
 
     // GPS
     private var useGPS : Boolean = true
@@ -90,62 +88,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // Get fragment for google map
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
 
+        // Get bottom sheet
+        bottomSheet = findViewById(R.id.collapsible_menu)
+
         Log.w("MainActivity", "Loading Google map...")
         mapFragment.getMapAsync(this)
 
-        Log.w("MainActivity", "Loading Ad from google services...")
+        // Advertising
+        initializeAdvertising()
 
-        //advertising
-        adView = findViewById(R.id.adView)
-        //adView.adSize = getFullWidthAdSize()
-
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
-
-        Log.w("MainActivity", "Ad loaded!")
-
-        // Get bottom sheet
-        bottomSheet = findViewById<LinearLayout>(R.id.collapsible_menu)
-
-        // Setup settings button
-        val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
-        settingsButton.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Setup recenter button
-        val recenterButton = findViewById<ImageButton>(R.id.recenterButton)
-        recenterButton.setOnClickListener {
-            moveMapToGPSLocation()
-        }
-
-        // Setup seekbar
-        val seekbar = findViewById<SeekBar>(R.id.seekbar)
-        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar?,
-                progress: Int,
-                fromUser: Boolean
-            ) {
-                Log.w("MainActivity", progress.toString())
-
-                // Square progress to get real value
-                seekBarMaxDist = progress.toFloat() * progress.toFloat()
-                val distInKm : Float = seekBarMaxDist / 1000.0f
-                val kmString = String.format("%.1f", distInKm)
-                findViewById<TextView>(R.id.seekbarDistDisplay).text = "${kmString}km"
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                updateMapMarkers()
-            }
-
-        })
+        // Add listeners to settings button, recenter button, and seekbar
+        addListenersToUI()
 
         // Initialize GPS
         if(useGPS) {
@@ -178,6 +131,57 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         // Subscribe to marker clicks
         map.setOnMarkerClickListener(this)
+    }
+
+    private fun initializeAdvertising() {
+        Log.w("MainActivity", "Loading Ad from google services...")
+        adView = findViewById(R.id.adView)
+
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+        Log.w("MainActivity", "Ad loaded!")
+    }
+
+    private fun addListenersToUI() {
+        // Add listener to settings button
+        val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
+        settingsButton.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add listener to recenter button
+        val recenterButton = findViewById<ImageButton>(R.id.recenterButton)
+        recenterButton.setOnClickListener {
+            moveMapToGPSLocation()
+        }
+
+        // Add listener to seekbar
+        val seekbar = findViewById<SeekBar>(R.id.seekbar)
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                Log.w("MainActivity", progress.toString())
+
+                // Square progress to get real value
+                seekBarMaxDist = progress.toFloat() * progress.toFloat()
+                val distInKm : Float = seekBarMaxDist / 1000.0f
+                val kmString = String.format("%.1f", distInKm)
+                findViewById<TextView>(R.id.seekbarDistDisplay).text = "${kmString}km"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                updateMapMarkers()
+            }
+
+        })
     }
 
     private fun getGPSLatLng(): LatLng? {
