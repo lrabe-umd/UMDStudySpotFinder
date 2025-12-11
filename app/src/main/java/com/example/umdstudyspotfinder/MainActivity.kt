@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlin.text.get
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -56,39 +57,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     // GPS
     private var useGPS : Boolean = true
-    private lateinit var locationClient: FusedLocationProviderClient
-    private var curLatLng: LatLng? = null
+    private var gpsManager : GPSManager? = null
     private var locationIndicator: Circle? = null
-
     private val gpsPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            permissions ->
+                permissions ->
 
             if(permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                 // User granted fine location access
-                startGPSRequests()
+                gpsManager = GPSManager(this, { onGPSUpdate() })
             } else if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
                 // User granted only coarse location access
+                gpsManager = GPSManager(this, { onGPSUpdate() })
             } else {
                 // User did not grant any location access
+                // Do nothing with gps...
             }
         }
-
-    private val locationCallback = object: LocationCallback() {
-        override fun onLocationResult(p0: LocationResult) {
-            super.onLocationResult(p0)
-
-            val location = p0.lastLocation
-            if(location != null) {
-                if(map != null) {
-                    curLatLng = LatLng(location.latitude, location.longitude)
-                    drawGPSLocationOnMap()
-                    updateMapMarkers()
-                    updateRecycler()
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,18 +82,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         // RUN THIS ONCE to populate database, then comment it out
         // populateStudySpots()
 
-        // testDatabase()
-
-        // Test filter values
-        selectedTagList = mutableListOf("outside")
-
-        // Get study spots
-        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
+        // Get filtered study spots
+        dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(), { spots ->
             setupRecycler(spots.toMutableList())
         })
 
         // Get fragment for google map
-        var mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
+        val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.main_map) as SupportMapFragment
 
         Log.w("MainActivity", "Loading Google map...")
         mapFragment.getMapAsync(this)
@@ -141,7 +121,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
 
         // Setup seekbar
-        var seekbar = findViewById<SeekBar>(R.id.seekbar)
+        val seekbar = findViewById<SeekBar>(R.id.seekbar)
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar?,
@@ -169,6 +149,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         // Initialize GPS
         if(useGPS) {
+            Log.w("MainActivity", "Requesting GPS Permissions!")
             requestGPSPermissions()
         }
     }
@@ -181,7 +162,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         map.moveCamera(update)
 
         // Add markers
-        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+
+        dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
                 var marker = map.addMarker(
@@ -198,13 +180,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         map.setOnMarkerClickListener(this)
     }
 
-    fun updateMapMarkers() {
+    private fun getGPSLatLng(): LatLng? {
+        if(gpsManager != null) {
+            return gpsManager!!.curLatLng
+        }
+        return null
+    }
+
+    private fun updateMapMarkers() {
         for(marker in mapMarkers) {
             marker.remove()
         }
 
         // Add markers
-        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+        dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             for(spot in spots) {
                 val pos = LatLng(spot.latitude, spot.longitude)
                 var marker = map.addMarker(
@@ -218,27 +207,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         })
     }
 
-    private fun startGPSRequests() {
-        locationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        // GPS request every 10 seconds
-        val locationRequest =
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
-
-        // Make sure we actually have the perms
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
-
-        locationClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
-
-        Log.w("MainActivity", "GPS requests started!")
+    private fun onGPSUpdate() {
+        drawGPSLocationOnMap()
+        updateMapMarkers()
+        updateRecycler()
     }
 
     private fun requestGPSPermissions() {
@@ -251,13 +223,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     private fun moveMapToGPSLocation() {
-        if(curLatLng == null) return
-        val cameraUpdate = CameraUpdateFactory.newLatLng(curLatLng!!)
+        if(getGPSLatLng() == null) return
+        val cameraUpdate = CameraUpdateFactory.newLatLng(getGPSLatLng()!!)
         map.animateCamera(cameraUpdate)
     }
 
     private fun drawGPSLocationOnMap() {
-        if(curLatLng == null) return
+        if(getGPSLatLng() == null) return
 
         if(locationIndicator != null) {
             locationIndicator!!.remove()
@@ -265,7 +237,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         locationIndicator = map.addCircle(
             CircleOptions()
-                .center(curLatLng!!)
+                .center(getGPSLatLng()!!)
                 .radius(50.0)
                 .fillColor(Color.CYAN)
         )
@@ -285,7 +257,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private fun updateRecycler() {
         // Add markers
-        dbManager.getFilteredStudySpots(curLatLng, seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
+        dbManager.getFilteredStudySpots(getGPSLatLng(), seekBarMaxDist, DatabaseManager.SavedPrefs.getAll(this).toList(),{ spots ->
             setupRecycler(spots.toMutableList())
         })
     }
